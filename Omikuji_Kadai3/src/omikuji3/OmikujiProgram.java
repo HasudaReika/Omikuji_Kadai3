@@ -1,17 +1,20 @@
 package omikuji3;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
+
+import db.DBManager;
 
 public class OmikujiProgram {
 	//OmikujiReaderオブジェクトを作成し、コンストラクタを呼び出す
@@ -89,18 +92,41 @@ public class OmikujiProgram {
 		//取得したおみくじを出力
 		System.out.println(fortuneResult.disp());
 
-		//結果をファイルに追記する→DBに追記
+		//結果をDBに登録
+		Connection connection = null;
+		PreparedStatement preparedStatement = null;
+
 		try {
-			FileWriter file = new FileWriter("file.txt", true);
-			PrintWriter pw = new PrintWriter(new BufferedWriter(file));
-			//			System.out.println("結果をファイルに追記しました");
-			pw.println(birthday + "\n" + fortuneResult.disp());
-			pw.close();
+			//DBに接続
+			connection = DBManager.getConnection();
 
-		} catch (IOException e) {
-			//			System.out.println("ファイルに追記できませんでした");
+			//SQLを準備
+			String sql = "insert into result values"
+					+ "(current_date, ?, ?, '蓮田', current_date, '蓮田', current_date)";
+
+			//ステートメントを作成
+			preparedStatement = connection.prepareStatement(sql);
+
+			//birthdayをLocalDate型に変換
+			LocalDate localDate = LocalDate.parse(birthday, DateTimeFormatter.ofPattern("yyyyMMdd"));
+			//localDateをsql.Date型に変換
+			Date birthdayDate = Date.valueOf(localDate);
+			
+			//入力値をバインド
+			preparedStatement.setDate(1, birthdayDate);
+			preparedStatement.setInt(2, fortuneResult.omikujiCode);
+
+			//sql文を実行
+			preparedStatement.executeUpdate();
+			System.out.println("結果をdbに登録しました");
+
+		} catch (Exception e) {
+			System.out.println("結果を登録できませんでした");
 			e.printStackTrace();
-
+		} finally {
+			//クローズ処理
+			DBManager.close(preparedStatement);
+			DBManager.close(connection);
 		}
 	}
 
