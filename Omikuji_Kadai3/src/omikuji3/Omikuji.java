@@ -8,11 +8,11 @@ import java.io.Serializable;
 
 public class Omikuji implements Fortune, Serializable {
 
+	protected int omikujiCode;
 	protected String fortuneName;
 	protected String negaigoto;
 	protected String akinai;
 	protected String gakumon;
-	protected int omikujiCode;
 
 	//コンストラクタで値を取得
 	public Omikuji(int omikujiCode, String fortuneName, String negaigoto, String akinai,
@@ -22,46 +22,6 @@ public class Omikuji implements Fortune, Serializable {
 		this.negaigoto = negaigoto;
 		this.akinai = akinai;
 		this.gakumon = gakumon;
-	}
-
-	public String getFortuneName() {
-		return fortuneName;
-	}
-
-	public void setFortuneName(String fortuneName) {
-		this.fortuneName = fortuneName;
-	}
-
-	public String getNegaigoto() {
-		return negaigoto;
-	}
-
-	public void setNegaigoto(String negaigoto) {
-		this.negaigoto = negaigoto;
-	}
-
-	public String getAkinai() {
-		return akinai;
-	}
-
-	public void setAkinai(String akinai) {
-		this.akinai = akinai;
-	}
-
-	public String getGakumon() {
-		return gakumon;
-	}
-
-	public void setGakumon(String gakumon) {
-		this.gakumon = gakumon;
-	}
-
-	public int getOmikujiCode() {
-		return omikujiCode;
-	}
-
-	public void setOmikujiCode(int omikujiCode) {
-		this.omikujiCode = omikujiCode;
 	}
 
 	@Override
