@@ -54,10 +54,6 @@ public class DBManager {
 		}
 	}
 
-//	public void setSql(String sql) {
-//		this.preparedStatement = ;
-//	}
-	
 	/**
 	*
 	* PreparedStatementをクローズする

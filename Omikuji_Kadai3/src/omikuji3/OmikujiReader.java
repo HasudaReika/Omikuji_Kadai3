@@ -28,6 +28,7 @@ public class OmikujiReader {
 			//DBに接続
 			connection = DBManager.getConnection();
 			//SQLを準備
+			//テーブルからおみくじコード、運勢名、願い事、商い、学問を取得
 			String sql = "SELECT omikuji_code, fortune_name, negaigoto, akinai, gakumon " +
 					"FROM fortune_master f LEFT OUTER JOIN omikuji o " +
 					"ON f.fortune_code = o.fortune_code ";
@@ -36,6 +37,7 @@ public class OmikujiReader {
 			//SQLを実行
 			resultSet = preparedStatement.executeQuery();
 
+			//レコードを１行ずつ取得し、各値を変数に代入
 			while (resultSet.next()) {
 				int omikujiCode = resultSet.getInt("omikuji_code");
 				String fortuneName = resultSet.getString("fortune_name");
