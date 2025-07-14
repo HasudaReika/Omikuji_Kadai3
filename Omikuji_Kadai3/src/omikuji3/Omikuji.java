@@ -9,6 +9,10 @@ import java.io.Serializable;
 public class Omikuji implements Fortune, Serializable {
 
 	protected int omikujiCode;
+	public int getOmikujiCode() {
+		return omikujiCode;
+	}
+
 	protected String fortuneName;
 	protected String negaigoto;
 	protected String akinai;
