@@ -32,7 +32,7 @@ public class DBManager {
 		//DBに接続
 		Connection connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD);
 
-		System.out.println("接続しました");
+//		System.out.println("接続しました");
 
 		return connection;
 	}
@@ -47,7 +47,7 @@ public class DBManager {
 		if (connection != null) {
 			try {
 				connection.close();
-				System.out.println("DBと切断しました");
+//				System.out.println("DBと切断しました");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

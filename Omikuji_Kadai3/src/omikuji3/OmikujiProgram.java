@@ -1,19 +1,29 @@
 package omikuji3;
 
+/*
+ * メインクラス
+ */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class OmikujiProgram {
 
-	static OmikujiDB omikujiDB;
+	static OmikujiDB omikujiDB = new OmikujiDB();
 
-	public static void main(String[] args) throws IOException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
 		//DBにおみくじが格納されているかチェック
-//		omikujiDB.checkDB();
+		if (omikujiDB.checkDB()) { //DBにおみくじが格納されていない場合
+			//おみくじをDBに格納する
+			omikujiDB.importOmikujiFromCsv();
+		}
 
+		//誕生日入力に進む
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		String inputDateString;
 
@@ -62,8 +72,29 @@ public class OmikujiProgram {
 	}
 
 	//おみくじを出すメソッド
-	public static void fortuneTelling(String birthday) {
-		
+	public static void fortuneTelling(String birthday) throws ClassNotFoundException, SQLException {
+		//今日の日時を取得
+		LocalDate today = LocalDate.now();
+		//birthdayをLocalDate型に変換
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		LocalDate bdDate = LocalDate.parse(birthday, formatter);
+
+		Omikuji omikuji = null;
+		Omikuji newOmikuji = null;
+		//resultテーブルに占った日と誕生日が一致する結果が存在するかチェック、あればおみくじを取得
+		//なければnullを返す
+		omikuji = omikujiDB.getOmikujiFromResult(today, bdDate);
+		if (omikuji != null) {
+			System.out.println(omikuji.disp());
+
+		} else {
+			//DBからおみくじをランダムに1つ取得
+			newOmikuji = omikujiDB.getRandomOmikuji();
+			System.out.println(newOmikuji.disp());
+			//結果をDBに登録
+			omikujiDB.saveResult(bdDate, newOmikuji);
+		}
+
 	}
 
 }

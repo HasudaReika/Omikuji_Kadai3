@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class Omikuji implements Fortune, Serializable {
 
 	protected int omikujiCode;
+
 	public int getOmikujiCode() {
 		return omikujiCode;
 	}
