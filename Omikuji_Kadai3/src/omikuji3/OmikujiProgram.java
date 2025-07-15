@@ -16,6 +16,14 @@ public class OmikujiProgram {
 
 	static OmikujiDB omikujiDB = new OmikujiDB();
 
+	/**
+	 * メインメソッド
+	 * 誕生日の入力を受付、その情報に基づいておみくじ結果を表示し、DBに記録する一連の処理を実行
+	 * @param args
+	 * @throws IOException 入出力操作中にエラーが発生した場合
+	 * @throws ClassNotFoundException DBドライバが見つからない場合
+	 * @throws SQLException DB操作中にエラーが発生した場合
+	 */
 	public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
 		//DBにおみくじが格納されているかチェック
 		if (omikujiDB.checkDB()) { //DBにおみくじが格納されていない場合
@@ -51,7 +59,11 @@ public class OmikujiProgram {
 		}
 	}
 
-	//日付の妥当性チェック
+	/**
+	 * 入力された誕生日が正しい形式かチェック
+	 * @param inputDateString 入力された誕生日の文字列'yyyyMMdd'
+	 * @return 日付が正しい場合はtrue、そうでない場合はfalseを返す
+	 */
 	private static boolean isValidDate(String inputDateString) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		//日時解析を厳密に行う
@@ -71,7 +83,13 @@ public class OmikujiProgram {
 
 	}
 
-	//おみくじを出すメソッド
+	/**
+	 * 入力された誕生日に基づいておみくじの結果を取得・表示・DBに登録
+	 * 占った日付と誕生日が同じ結果があればそれを表示、なければ新しく取得
+	 * @param birthday 入力された誕生日文字列'yyyyMMdd'
+	 * @throws ClassNotFoundException DBドライバが見つからない場合
+	 * @throws SQLException DB操作中にエラーが発生した場合
+	 */
 	public static void fortuneTelling(String birthday) throws ClassNotFoundException, SQLException {
 		//今日の日時を取得
 		LocalDate today = LocalDate.now();
