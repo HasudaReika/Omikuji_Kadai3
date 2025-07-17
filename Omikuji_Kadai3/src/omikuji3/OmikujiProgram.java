@@ -11,8 +11,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Random;
 
 public class OmikujiProgram {
 
@@ -98,10 +96,9 @@ public class OmikujiProgram {
 		//birthdayをLocalDate型に変換
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 		LocalDate bdDate = LocalDate.parse(birthday, formatter);
-		//おみくじを格納するリスト
-		List<Omikuji> list = omikujiDB.getRandomOmikuji();
 
 		Omikuji omikuji = null;
+		Omikuji newOmikuji = null;
 		//resultテーブルに占った日と誕生日が一致する結果が存在するかチェック、あればおみくじを取得
 		//なければnullを返す
 		omikuji = omikujiDB.getOmikujiFromResult(today, bdDate);
@@ -109,13 +106,8 @@ public class OmikujiProgram {
 			System.out.println(omikuji.disp());
 
 		} else {
-			//ランダム変数を生成
-			Random random = new Random();
-			int omikujiList = random.nextInt(list.size());
-			//リストからランダムにおみくじを取得
-			Omikuji newOmikuji = list.get(omikujiList);
-//			DBからおみくじをランダムに1つ取得
-//			newOmikuji = omikujiDB.getRandomOmikuji();
+			//DBからおみくじをランダムに1つ取得
+			newOmikuji = omikujiDB.getRandomOmikuji();
 			System.out.println(newOmikuji.disp());
 			//結果をDBに登録
 			omikujiDB.saveResult(bdDate, newOmikuji);

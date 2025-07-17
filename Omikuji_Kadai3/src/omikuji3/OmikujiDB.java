@@ -11,8 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
 import db.DBManager;
 
@@ -218,49 +217,75 @@ public class OmikujiDB {
 	 * @throws SQLException DB操作中にエラーが発生した場合
 	 * @throws ClassNotFoundException DBドライバが見つからなかった場合
 	 */
-	public List<Omikuji> getRandomOmikuji() throws SQLException, ClassNotFoundException {
-		//おみくじオブジェクトを格納するリスト
-		List<Omikuji> allOmikuji = new ArrayList<Omikuji>();
+	public Omikuji getRandomOmikuji() throws SQLException, ClassNotFoundException {
 		Connection connection = null;
-		PreparedStatement preparedStatement = null;
-		ResultSet resultSet = null;
-		Omikuji omikujiObject = null;
+		Omikuji randomOikuji = null;
+		//omikujiテーブルのレコード数を表す変数
+		int omikujiCount = 0;
 
 		try {
 			connection = DBManager.getConnection();
-			//SQLを準備
-			//テーブルからおみくじコード、運勢名、願い事、商い、学問を取得
-			String sql = "SELECT omikuji_code, fortune_name, negaigoto, akinai, gakumon " +
-					"FROM fortune_master f LEFT OUTER JOIN omikuji o " +
-					"ON f.fortune_code = o.fortune_code";
+			//おみくじの件数を取得
+			try {
+				PreparedStatement preparedStatement = null;
+				ResultSet resultSet = null;
+				//omikujiテーブルのレコード数を取得
+				String sqlCountOmikuji = "SELECT COUNT(*) FROM omikuji";
+				//ステートメントを作成
+				preparedStatement = connection.prepareStatement(sqlCountOmikuji);
+				//SQLを実行
+				resultSet = preparedStatement.executeQuery();
 
-			//ステートメントを作成
-			preparedStatement = connection.prepareStatement(sql);
-			//SQLを実行
-			resultSet = preparedStatement.executeQuery();
-
-			//結果を取得し変数に代入
-			while (resultSet.next()) {
-				int omikujiCode = resultSet.getInt("omikuji_code");
-				String fortuneName = resultSet.getString("fortune_name");
-				String negaigoto = resultSet.getString("negaigoto");
-				String akinai = resultSet.getString("akinai");
-				String gakumon = resultSet.getString("gakumon");
-
-				//オブジェクトを作成
-				omikujiObject = new Omikuji(omikujiCode, fortuneName, negaigoto, akinai, gakumon);
-				//オブジェクトをリストに追加
-				allOmikuji.add(omikujiObject);
+				//結果を取得し変数に代入
+				if (resultSet.next()) {
+					//レコード数をomikujiCountに代入
+					omikujiCount = resultSet.getInt(1);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
+
+			try {
+				PreparedStatement preparedStatement2 = null;
+				ResultSet resultSet2 = null;
+
+				//omikujiCountからランダムに数字を取得し、おみくじコードとする
+				Random random = new Random();
+				int omikujiCode = random.nextInt(omikujiCount);
+
+				//おみくじコードの運勢名、願い事、商い、学問を取得
+				String sqlGetOmikuji = "SELECT omikuji_code, fortune_name, negaigoto, akinai, gakumon " +
+						"FROM fortune_master f LEFT OUTER JOIN omikuji o " +
+						"ON f.fortune_code = o.fortune_code WHERE omikuji_code = ?";
+
+				//ステートメントの作成
+				preparedStatement2 = connection.prepareStatement(sqlGetOmikuji);
+				//入力値をバインド
+				preparedStatement2.setInt(1, omikujiCode);
+				//SQLを実行
+				resultSet2 = preparedStatement2.executeQuery();
+
+				//結果を取得
+				if (resultSet2.next()) {
+					String fortuneName = resultSet2.getString("fortune_name");
+					String negaigoto = resultSet2.getString("negaigoto");
+					String akinai = resultSet2.getString("akinai");
+					String gakumon = resultSet2.getString("gakumon");
+
+					//おみくじオブジェクトを作成
+					randomOikuji = new Omikuji(omikujiCode, fortuneName, negaigoto, akinai, gakumon);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			//クローズ処理
-			DBManager.close(resultSet);
-			DBManager.close(preparedStatement);
 			DBManager.close(connection);
 		}
-		return allOmikuji;
+		return randomOikuji;
 	}
 
 	/**
