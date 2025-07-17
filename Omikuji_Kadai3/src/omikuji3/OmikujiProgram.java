@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -95,7 +97,9 @@ public class OmikujiProgram {
 		LocalDate today = LocalDate.now();
 		//birthdayをLocalDate型に変換
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-		LocalDate bdDate = LocalDate.parse(birthday, formatter);
+		//誕生日文字列を半角に変換
+		String birthdayString = Normalizer.normalize(birthday, Form.NFKC);
+		LocalDate bdDate = LocalDate.parse(birthdayString, formatter);
 
 		Omikuji omikuji = null;
 		Omikuji newOmikuji = null;
