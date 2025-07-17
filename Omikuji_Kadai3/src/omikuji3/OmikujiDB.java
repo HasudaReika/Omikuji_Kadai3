@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import db.DBManager;
 
@@ -48,7 +50,7 @@ public class OmikujiDB {
 					empty = false;
 				} else {
 					//なければtrue
-					System.out.println("プロパティファイルからおみくじを取り込みます");
+					System.out.println("csvからおみくじを取り込みます");
 					empty = true;
 				}
 			}
@@ -216,11 +218,13 @@ public class OmikujiDB {
 	 * @throws SQLException DB操作中にエラーが発生した場合
 	 * @throws ClassNotFoundException DBドライバが見つからなかった場合
 	 */
-	public Omikuji getRandomOmikuji() throws SQLException, ClassNotFoundException {
+	public List<Omikuji> getRandomOmikuji() throws SQLException, ClassNotFoundException {
+		//おみくじオブジェクトを格納するリスト
+		List<Omikuji> allOmikuji = new ArrayList<Omikuji>();
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
-		Omikuji randomOmikuji = null;
+		Omikuji omikujiObject = null;
 
 		try {
 			connection = DBManager.getConnection();
@@ -228,12 +232,13 @@ public class OmikujiDB {
 			//テーブルからおみくじコード、運勢名、願い事、商い、学問を取得
 			String sql = "SELECT omikuji_code, fortune_name, negaigoto, akinai, gakumon " +
 					"FROM fortune_master f LEFT OUTER JOIN omikuji o " +
-					"ON f.fortune_code = o.fortune_code " +
-					" order by random () limit 1";
+					"ON f.fortune_code = o.fortune_code";
+
 			//ステートメントを作成
 			preparedStatement = connection.prepareStatement(sql);
 			//SQLを実行
 			resultSet = preparedStatement.executeQuery();
+
 			//結果を取得し変数に代入
 			while (resultSet.next()) {
 				int omikujiCode = resultSet.getInt("omikuji_code");
@@ -241,8 +246,11 @@ public class OmikujiDB {
 				String negaigoto = resultSet.getString("negaigoto");
 				String akinai = resultSet.getString("akinai");
 				String gakumon = resultSet.getString("gakumon");
+
 				//オブジェクトを作成
-				randomOmikuji = new Omikuji(omikujiCode, fortuneName, negaigoto, akinai, gakumon);
+				omikujiObject = new Omikuji(omikujiCode, fortuneName, negaigoto, akinai, gakumon);
+				//オブジェクトをリストに追加
+				allOmikuji.add(omikujiObject);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -252,7 +260,7 @@ public class OmikujiDB {
 			DBManager.close(preparedStatement);
 			DBManager.close(connection);
 		}
-		return randomOmikuji;
+		return allOmikuji;
 	}
 
 	/**
